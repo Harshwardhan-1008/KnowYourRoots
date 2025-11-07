@@ -1,15 +1,44 @@
 @import "tailwindcss";
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.2s ease-in-out;
+}
 
+/* ------------------------------
+   FONT IMPORTS (local fonts)
+-------------------------------- */
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/PlayfairDisplay-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ------------------------------
+   COLOR VARIABLES
+-------------------------------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FAF7F0; /* beige */
+  --foreground: #333333; /* dark gray */
+  --primary: #800000;    /* maroon */
+  --accent: #C8A951;     /* gold */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Inter', sans-serif;
+  --font-serif: 'Playfair Display', serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,8 +48,50 @@
   }
 }
 
+/* ------------------------------
+   BODY STYLING
+-------------------------------- */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  margin: 0;
+  padding: 0;
+}
+
+/* ------------------------------
+   HEADINGS (Playfair Display)
+-------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  color: var(--primary);
+}
+
+/* ------------------------------
+   LINKS & ACCENTS
+-------------------------------- */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+@keyframes float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-20px) scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+}
+
+.animate-float {
+  animation: float 10s ease-in-out infinite;
 }

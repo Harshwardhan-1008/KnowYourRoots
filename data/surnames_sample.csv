@@ -1,0 +1,4 @@
+key,surname,origin_type,origin_text,place_name,meaning,region,language_of_origin,community,source_urls,certainty_score
+kasliwal,Kasliwal,place,From Kasli village in Rajasthan,Kasli,Someone from Kasli village (Rajasthan); historically a toponymic surname among Jain and Hindu communities.,Rajasthan,Hindi,Jain/Hindu,https://gazetteer.example.org;https://localhistories.example.com,95
+kapoor,Kapoor,occupation,Derived from 'Kapuria' meaning cloth merchant,,A Punjabi Khatri surname traditionally associated with textile traders.,Punjab,Punjabi,Khatri,https://books.example.org/kapoor,88
+patni,Patni,community,Associated with business and trade communities,,Surname found among Marwari traders and Jains.,Rajasthan,Marwari,Jain,https://rajasthanhistory.example.org/patni,80
