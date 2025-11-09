@@ -1,3 +1,6 @@
+// ✅ Force Node.js runtime (MongoDB won't work on Edge)
+export const runtime = "nodejs";
+
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Surname from "@/lib/models/Surname";
