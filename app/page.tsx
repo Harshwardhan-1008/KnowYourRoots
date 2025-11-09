@@ -48,9 +48,6 @@ useEffect(() => {
       color: "#800000",
     },
   };
-
-  const rzp = new window.Razorpay(options);
-  rzp.open();
 };
   return (
     <>
@@ -361,18 +358,6 @@ useEffect(() => {
             <span className="text-[#800000] font-medium">Harshwardhan Kasliwal</span>
           </p>
         </footer>
-        {/* ✅ Auto Donation Popup */}
-{donationOpen && (
-  <div className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 backdrop-blur-sm transition-opacity">
-
-    <div className="bg-[#FAF3E4] w-80 sm:w-96 rounded-2xl shadow-2xl p-6 relative animate-fadeIn scale-95 hover:scale-100 transition">
-
-      {/* Close Button */}
-      <button 
-        onClick={() => setDonationOpen(false)}
-        className="absolute top-3 right-4 text-2xl font-bold text-[#4A1A0A] hover:text-red-700 transition">
-        ×
-      </button>
 
       {/* Popup Content */}
       <h2 className="text-2xl font-serif text-[#4A1A0A] mb-2 text-center">
@@ -383,31 +368,9 @@ useEffect(() => {
         Your support keeps this mission alive. 🌿
       </p>
 
-      {/* Razorpay Buttons */}
-      <div className="flex flex-col gap-3">
-        <button onClick={() => startRazorpayPayment(49)}
-          className="bg-[#C8A951] text-[#4A1A0A] py-2 rounded-lg font-semibold hover:bg-[#4A1A0A] hover:text-[#FAF7F0] transition">
-          ₹49 — Appreciate 💛
-        </button>
-
-        <button onClick={() => startRazorpayPayment(99)}
-          className="bg-[#C8A951] text-[#4A1A0A] py-2 rounded-lg font-semibold hover:bg-[#4A1A0A] hover:text-[#FAF7F0] transition">
-          ₹99 — Support Research 📜
-        </button>
-
-        <button onClick={() => startRazorpayPayment(199)}
-          className="bg-[#C8A951] text-[#4A1A0A] py-2 rounded-lg font-semibold hover:bg-[#4A1A0A] hover:text-[#FAF7F0] transition">
-          ₹199 — Help Us Grow 🚀
-        </button>
-      </div>
-
       <p className="text-xs mt-4 text-center text-[#6A4A3A] opacity-80">
         Even a small help brings someone's history to life ✨
       </p>
-
-    </div>
-  </div>
-)}
       </main>
     </>
   );
