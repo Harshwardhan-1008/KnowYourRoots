@@ -4,19 +4,20 @@ import Surname from "@/lib/models/Surname";
 
 export const runtime = "nodejs";
 
-type UploadRecord = {
+interface UploadRecord {
   surname: string;
   shortSummary?: string;
   description?: string;
   origin?: string;
   published?: boolean;
-};
+}
 
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    const records = (await req.json()) as UploadRecord[];
+    // ✅ Parse JSON and cast to UploadRecord[]
+    const records = (await req.json()) as unknown as UploadRecord[];
 
     if (!Array.isArray(records)) {
       return NextResponse.json(
@@ -25,20 +26,24 @@ export async function POST(req: Request) {
       );
     }
 
-    const invalidRows: any[] = [];
+    const invalidRows: UploadRecord[] = [];
     const validRows: UploadRecord[] = [];
 
-    for (const r of records) {
+    // ✅ Explicit type for r (Fixes "type unknown" issue)
+    for (const r of records as UploadRecord[]) {
       if (!r.surname || !r.description) {
-        invalidRows.push({ ...r, reason: "Missing surname or description" });
+        invalidRows.push({
+          ...r,
+          reason: "Missing surname or description",
+        } as any);
         continue;
       }
 
       validRows.push({
-        surname: r.surname,
-        shortSummary: r.shortSummary || "",
-        description: r.description || "",
-        origin: r.origin || "Unknown",
+        surname: r.surname.trim(),
+        shortSummary: r.shortSummary?.trim() || "",
+        description: r.description.trim(),
+        origin: r.origin?.trim() || "Unknown",
         published: r.published ?? true,
       });
     }
@@ -54,6 +59,9 @@ export async function POST(req: Request) {
       message: "Upload completed",
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
