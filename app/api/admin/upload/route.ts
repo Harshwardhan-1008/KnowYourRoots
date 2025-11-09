@@ -10,14 +10,15 @@ interface UploadRecord {
   description?: string;
   origin?: string;
   published?: boolean;
+  [key: string]: any; // ✅ allows other fields without TS error
 }
 
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    // ✅ Parse JSON and cast to UploadRecord[]
-    const records = (await req.json()) as unknown as UploadRecord[];
+    // ✅ Explicit cast to UploadRecord[]
+    const records = (await req.json()) as UploadRecord[];
 
     if (!Array.isArray(records)) {
       return NextResponse.json(
@@ -29,13 +30,12 @@ export async function POST(req: Request) {
     const invalidRows: UploadRecord[] = [];
     const validRows: UploadRecord[] = [];
 
-    // ✅ Explicit type for r (Fixes "type unknown" issue)
-    for (const r of records as UploadRecord[]) {
+    for (const r of records) {  // ✅ r is now UploadRecord, not unknown
       if (!r.surname || !r.description) {
         invalidRows.push({
           ...r,
           reason: "Missing surname or description",
-        } as any);
+        });
         continue;
       }
 
