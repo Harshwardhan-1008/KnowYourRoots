@@ -1,54 +1,59 @@
 import { NextResponse } from "next/server";
-import clientPromise from "@/lib/mongodb";
-import { parse } from "csv-parse/sync";
+import connectDB from "@/lib/db";
+import Surname from "@/lib/models/Surname";
 
-export const runtime = "nodejs"; // ✅ ensure proper streaming env
+export const runtime = "nodejs";
+
+type UploadRecord = {
+  surname: string;
+  shortSummary?: string;
+  description?: string;
+  origin?: string;
+  published?: boolean;
+};
 
 export async function POST(req: Request) {
   try {
-    const formData = await req.formData();
-    const file = formData.get("file") as File;
+    await connectDB();
 
-    if (!file) {
-      return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
+    const records = (await req.json()) as UploadRecord[];
+
+    if (!Array.isArray(records)) {
+      return NextResponse.json(
+        { error: "Invalid JSON format. Expected an array." },
+        { status: 400 }
+      );
     }
 
-    const text = await file.text();
-    const records = parse(text, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-    });
-
-    const client = await clientPromise;
-    const db = client.db("Surname_Project");
-    const collection = db.collection("surnames");
-
-    const validRows: any[] = [];
     const invalidRows: any[] = [];
+    const validRows: UploadRecord[] = [];
 
     for (const r of records) {
-      if (!r.surname || !r.meaning) {
-        invalidRows.push({ ...r, reason: "Missing surname or meaning" });
+      if (!r.surname || !r.description) {
+        invalidRows.push({ ...r, reason: "Missing surname or description" });
         continue;
       }
 
-      r.key = (r.key || r.surname.toLowerCase()).trim();
-      r.certainty_score = parseInt(r.certainty_score || "50");
-      r.added_at = new Date();
-
-      validRows.push(r);
+      validRows.push({
+        surname: r.surname,
+        shortSummary: r.shortSummary || "",
+        description: r.description || "",
+        origin: r.origin || "Unknown",
+        published: r.published ?? true,
+      });
     }
 
-    const result = await collection.insertMany(validRows, { ordered: false });
+    if (validRows.length > 0) {
+      await Surname.insertMany(validRows, { ordered: false });
+    }
 
     return NextResponse.json({
-      success: true,
-      insertedCount: result.insertedCount,
+      inserted: validRows.length,
+      rejected: invalidRows.length,
       invalidRows,
+      message: "Upload completed",
     });
-  } catch (err: any) {
-    console.error("❌ CSV Upload Error:", err);
-    return NextResponse.json({ error: "Import failed", message: err.message }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
