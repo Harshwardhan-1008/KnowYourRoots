@@ -4,46 +4,44 @@ import Surname from "@/lib/models/Surname";
 
 export const runtime = "nodejs";
 
-interface UploadRecord {
+type UploadRecord = {
   surname: string;
   shortSummary?: string;
   description?: string;
   origin?: string;
   published?: boolean;
-  [key: string]: any; // ✅ allows other fields without TS error
-}
+};
 
 export async function POST(req: Request) {
   try {
     await connectDB();
 
-    // ✅ Explicit cast to UploadRecord[]
-    const records = (await req.json()) as UploadRecord[];
+    const json = await req.json();
 
-    if (!Array.isArray(records)) {
+    if (!Array.isArray(json)) {
       return NextResponse.json(
         { error: "Invalid JSON format. Expected an array." },
         { status: 400 }
       );
     }
 
-    const invalidRows: UploadRecord[] = [];
+    // ✅ Force type so TS never marks any item as "unknown"
+    const records = json as UploadRecord[];
+
+    const invalidRows: any[] = [];
     const validRows: UploadRecord[] = [];
 
-    for (const r of records) {  // ✅ r is now UploadRecord, not unknown
+    for (const r of records) {
       if (!r.surname || !r.description) {
-        invalidRows.push({
-          ...r,
-          reason: "Missing surname or description",
-        });
+        invalidRows.push({ ...r, reason: "Missing surname or description" });
         continue;
       }
 
       validRows.push({
-        surname: r.surname.trim(),
-        shortSummary: r.shortSummary?.trim() || "",
-        description: r.description.trim(),
-        origin: r.origin?.trim() || "Unknown",
+        surname: r.surname,
+        shortSummary: r.shortSummary || "",
+        description: r.description || "",
+        origin: r.origin || "Unknown",
         published: r.published ?? true,
       });
     }
@@ -59,9 +57,6 @@ export async function POST(req: Request) {
       message: "Upload completed",
     });
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || "Internal Server Error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
